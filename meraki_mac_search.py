@@ -3,10 +3,10 @@ import config
 
 # Set up Meraki API key and base URL
 api_key = config.api_key
-base_url = 'https://api.meraki.com/api/v0'
+base_url = 'https://api.meraki.com/api/v1'
 
 # Define MAC address to search for
-mac_address = 'e0:63:da:58:2c:9f'
+mac_address = input("MAC Address: example e0:63:da:58:2c:9f  ")
 
 # Get list of organizations
 headers = {'X-Cisco-Meraki-API-Key': api_key}
