@@ -1,0 +1,54 @@
+import requests
+import json
+import config
+import time
+
+# Replace with your own API key
+api_key = config.api_key
+
+# Replace with your own organization ID and network ID
+org_id = input("your_org_id  ")
+net_id = input("your_net_id  ")
+
+# Replace with the list of ports you want to shut down
+ports = [1, 2, 3, 5, 6, 7]
+
+# Replace with the serial number of the switch you want to configure
+switch_serial = "switch_serial_number"
+
+# URL for the Meraki API
+url = f"https://api.meraki.com/api/v0/networks/{net_id}/devices/{switch_serial}/switchPorts"
+
+# Header for the Meraki API request
+headers = {
+    "X-Cisco-Meraki-API-Key": api_key,
+    "Content-Type": "application/json"
+}
+
+# Loop through the list of ports and shut them down
+for port in ports:
+    payload = {
+        "name": f"Port {port}",
+        "enabled": False
+    }
+    port_url = f"{url}/{port}"
+    response = requests.put(port_url, headers=headers, data=json.dumps(payload))
+    if response.status_code == 200:
+        print(f"Port {port} has been shut down.")
+    else:
+        print(f"Failed to shut down port {port}. Status code: {response.status_code}")
+
+#sleep timer to give APs time to lose power 15s
+time.sleep(15)
+
+for port in ports:
+    payload = {
+        "name": f"Port {port}",
+        "enabled": True
+    }
+    port_url = f"{url}/{port}"
+    response = requests.put(port_url, headers=headers, data=json.dumps(payload))
+    if response.status_code == 200:
+        print(f"Port {port} has been shut down.")
+    else:
+        print(f"Failed to start {port}. Status code: {response.status_code}")
