@@ -1,37 +1,31 @@
 import requests
 import config
 
-# Set up Meraki API key and base URL
-api_key = config.api_key
-base_url = 'https://api.meraki.com/api/v1'
+# Set your Meraki API key
+API_KEY = config.api_key
 
-# Define MAC address to search for
-mac_address = input("MAC Address: example e0:63:da:58:2c:9f  ")
+# Set the device MAC address you want to search for
+device_mac = "10:62:e5:14:9a:88"
 
-# Get list of organizations
-headers = {'X-Cisco-Meraki-API-Key': api_key}
-response = requests.get(f'{base_url}/organizations', headers=headers)
-organizations = response.json()
+# Make a request to the Meraki API to get a list of all organizations
+org_url = "https://api.meraki.com/api/v1/organizations"
+headers = {"X-Cisco-Meraki-API-Key": API_KEY}
+response = requests.get(org_url, headers=headers)
+orgs = response.json()
 
-# Iterate through organizations
-for org in organizations:
-    org_id = org['id']
-    org_name = org['name']
-    
-    # Get list of networks in organization
-    response = requests.get(f'{base_url}/organizations/{org_id}/networks', headers=headers)
+# Loop through all organizations and check if the device MAC is in any of their networks
+for org in orgs:
+    org_id = org["id"]
+    network_url = f"https://api.meraki.com/api/v1/organizations/{org_id}/networks"
+    response = requests.get(network_url, headers=headers)
     networks = response.json()
     
-    # Iterate through networks
     for network in networks:
-        network_id = network['id']
-        network_name = network['name']
-        
-        # Get list of devices in network
-        response = requests.get(f'{base_url}/networks/{network_id}/devices', headers=headers)
+        network_id = network["id"]
+        device_url = f"https://api.meraki.com/api/v1/networks/{network_id}/devices"
+        response = requests.get(device_url, headers=headers)
         devices = response.json()
         
-        # Iterate through devices
         for device in devices:
-            if device['mac'] == mac_address:
-                print(f"Device with MAC address {mac_address} found in organization {org_name} and network {network_name}.")
+            if device["mac"] == device_mac:
+                print(f"The device with MAC address {device_mac} is located in the network {network['name']} in the organization {org['name']}.")
